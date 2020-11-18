@@ -1,3 +1,0 @@
-module DS {
-	Hi;
-}
