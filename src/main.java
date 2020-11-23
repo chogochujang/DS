@@ -46,7 +46,8 @@ public class main {
 				System.out.println("***********************************");
 				System.out.printf("select : ");
 				Integer X = scan.nextInt();
-				//if(X==1)//1.sign up
+				if(X==1)//1. world cup
+					World_cup(conn,st);
 				//else if(X==2)  //2.sign in
 				//else return;
 			}
@@ -133,5 +134,134 @@ public class main {
 		}
 		//scan.close();
 	}
+	public static void World_cup(Connection conn, Statement st)throws SQLException
+	{
+		Integer[] pal_gang = new Integer[9];
+		Integer[] sa_gang = new Integer[5];
+		Integer[] match = new Integer[3];
+		int win;
+		String[] fname = new String[65];
+		Double[] calorie = new Double[65];
+		Double[] c = new Double[65];
+		Double[] p = new Double[65];
+		Double[] f = new Double[65];
+		Integer[] price = new Integer[65];
+		int i = 0, choice;
+		Scanner scan = new Scanner(System.in);
+		String stmt = "select name, calorie, carbonhydrate, protein, fat, avg_price from food";
+		ResultSet rs = st.executeQuery(stmt);
+		while(rs.next()) {//food table 가져오기
+			fname[i] = rs.getString(1);
+			calorie[i] = rs.getDouble(2);
+			c[i] = rs.getDouble(3);
+			p[i] = rs.getDouble(4);
+			f[i] = rs.getDouble(5);
+			price[i] = rs.getInt(6);
+			i++;
+		}
 
+		//난수 생성
+		Integer[] rand = new Integer[16];
+		for(i=0; i<16;i++) {
+			rand[i] = (int)((Math.random()*100)%64);
+			for( int j=0; j<i;j++) {
+				if(rand[i]==rand[j]) {i--; break;}
+			}
+		}
+		System.out.println("***********************************");
+		System.out.println(" ----------- 당신의 선택 -----------");
+		System.out.println("               16강               ");
+		
+		for(i=0;i<16;i+=2) //16강
+		{
+			System.out.println(" ┌------------------------------┐ ");
+			System.out.println(" |          Round "+((i/2)+1)+"/8           |");
+			System.out.println(" |    # 1                #2     |" );
+			if(fname[rand[i]].length()<3)
+				System.out.println(" |   "+ fname[rand[i]]+"\t\t\t"+fname[rand[i+1]]+"\t|");
+			else
+				System.out.println(" |   "+ fname[rand[i]]+"\t\t"+fname[rand[i+1]]+"\t|");
+			if(calorie[rand[i+1]]<100)
+				System.out.println(" |  "+calorie[rand[i]]+"cal\t\t"+calorie[rand[i+1]]+"cal |");
+			else
+				System.out.println(" |  "+calorie[rand[i]]+"cal\t\t"+calorie[rand[i+1]]+"cal|");
+			System.out.println(" |  탄 "+ c[rand[i]]+"g\t\t"+c[rand[i+1]]+"g\t|");
+			System.out.println(" |  단 "+ p[rand[i]]+"g\t\t"+p[rand[i+1]]+"g\t|");
+			System.out.println(" |  지 "+f[rand[i]]+"g\t\t"+f[rand[i+1]]+"g\t|");
+			System.out.println(" |  가격 "+price[rand[i]]+"$\t\t"+price[rand[i+1]]+"$\t|");
+			System.out.println(" └------------------------------┘ ");
+			System.out.printf("What is your choice? :");
+			choice = scan.nextInt()-1;
+			pal_gang[i/2]=rand[choice+i];
+		}
+		System.out.println(" ----------- 당신의 선택 -----------");
+		System.out.println("                8강               ");
+		for(i=0;i<8;i+=2) //8강
+		{
+			System.out.println(" ┌------------------------------┐ ");
+			System.out.println(" |          Round "+((i/2)+1)+"/4           |");
+			System.out.println(" |    # 1                #2     |" );
+			if(fname[pal_gang[i]].length()<3)
+				System.out.println(" |   "+ fname[pal_gang[i]]+"\t\t\t"+fname[pal_gang[i+1]]+"\t|");
+			else
+				System.out.println(" |   "+ fname[pal_gang[i]]+"\t\t"+fname[pal_gang[i+1]]+"\t|");
+			if(calorie[pal_gang[i+1]]<100)
+				System.out.println(" |  "+calorie[pal_gang[i]]+"cal\t\t"+calorie[pal_gang[i+1]]+"cal |");
+			else
+				System.out.println(" |  "+calorie[pal_gang[i]]+"cal\t\t"+calorie[pal_gang[i+1]]+"cal|");
+			System.out.println(" |  탄 "+ c[pal_gang[i]]+"g\t\t"+c[pal_gang[i+1]]+"g\t|");
+			System.out.println(" |  단 "+ p[pal_gang[i]]+"g\t\t"+p[pal_gang[i+1]]+"g\t|");
+			System.out.println(" |  지 "+f[pal_gang[i]]+"g\t\t"+f[pal_gang[i+1]]+"g\t|");
+			System.out.println(" |  가격 "+price[pal_gang[i]]+"$\t\t"+price[pal_gang[i+1]]+"$\t|");
+			System.out.println(" └------------------------------┘ ");
+			System.out.printf("   What is your choice? :");
+			choice = scan.nextInt()-1;
+			sa_gang[i/2]=pal_gang[choice+i];
+		}
+		System.out.println(" ----------- 당신의 선택 -----------");
+		System.out.println("                4강               ");
+		for(i=0;i<4;i+=2) //4강
+		{
+			System.out.println(" ┌------------------------------┐ ");
+			System.out.println(" |          Round "+((i/2)+1)+"/2           |");
+			System.out.println(" |    # 1                #2     |" );
+			if(fname[sa_gang[i]].length()<3)
+				System.out.println(" |   "+ fname[sa_gang[i]]+"\t\t\t"+fname[sa_gang[i+1]]+"\t|");
+			else
+				System.out.println(" |   "+ fname[sa_gang[i]]+"\t\t"+fname[sa_gang[i+1]]+"\t|");
+			if(calorie[sa_gang[i+1]]<100)
+				System.out.println(" |  "+calorie[sa_gang[i]]+"cal\t\t"+calorie[sa_gang[i+1]]+"cal |");
+			else
+				System.out.println(" |  "+calorie[sa_gang[i]]+"cal\t\t"+calorie[sa_gang[i+1]]+"cal|");
+			System.out.println(" |  탄 "+ c[sa_gang[i]]+"g\t\t"+c[sa_gang[i+1]]+"g\t|");
+			System.out.println(" |  단 "+ p[sa_gang[i]]+"g\t\t"+p[sa_gang[i+1]]+"g\t|");
+			System.out.println(" |  지 "+f[sa_gang[i]]+"g\t\t"+f[sa_gang[i+1]]+"g\t|");
+			System.out.println(" |  가격 "+price[sa_gang[i]]+"$\t\t"+price[sa_gang[i+1]]+"$\t|");
+			System.out.println(" └------------------------------┘ ");
+			System.out.printf("   What is your choice? :");
+			choice = scan.nextInt()-1;
+			match[i/2]=sa_gang[choice+i];
+		}
+		//결승
+		System.out.println(" ┌---------- 당신의 선택 ----------┐");
+		System.out.println(" |              결승전            |");
+		System.out.println(" |    # 1                #2     |" );
+		if(fname[match[0]].length()<3)
+			System.out.println(" |   "+ fname[match[0]]+"\t\t\t"+fname[match[1]]+"\t|");
+		else
+			System.out.println(" |   "+ fname[match[0]]+"\t\t"+fname[match[1]]+"\t|");
+		if(calorie[match[1]]<100)
+			System.out.println(" |  "+calorie[match[0]]+"cal\t\t"+calorie[match[1]]+"cal |");
+		else
+			System.out.println(" |  "+calorie[match[0]]+"cal\t\t"+calorie[match[1]]+"cal|");
+		System.out.println(" |  탄 "+ c[match[0]]+"g\t\t"+c[match[1]]+"g\t|");
+		System.out.println(" |  단 "+ p[match[0]]+"g\t\t"+p[match[1]]+"g\t|");
+		System.out.println(" |  지 "+f[match[0]]+"g\t\t"+f[match[1]]+"g\t|");
+		System.out.println(" |  가격 "+price[match[0]]+"$\t\t"+price[match[1]]+"$\t|");
+		System.out.println(" └------------------------------┘ ");
+		System.out.printf("   What is your choice? :");
+		choice = scan.nextInt()-1;
+		System.out.println(fname[match[choice]] + " WIN!");
+	}
+	
 }
