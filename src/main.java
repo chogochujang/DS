@@ -48,8 +48,9 @@ public class main {
 				Integer X = scan.nextInt();
 				if(X==1)//1. world cup
 					World_cup(conn,st);
-				//else if(X==2)  //2.sign in
-				//else return;
+				else if(X==2) {
+					}
+				else return;
 			}
 		} catch(SQLException ex)
 		{
@@ -261,7 +262,30 @@ public class main {
 		System.out.println(" └------------------------------┘ ");
 		System.out.printf("   What is your choice? :");
 		choice = scan.nextInt()-1;
-		System.out.println(fname[match[choice]] + " WIN!");
+		String win_menu = fname[match[choice]];
+		System.out.println("************ "+ win_menu + " WIN! ************");
+		
+		//음식점 리스트
+		stmt = "select name,address,contact from good_restaurant where main_menu like '%"+win_menu+"%'";
+		rs = st.executeQuery(stmt);
+		i=1;
+		System.out.printf("[ 모범 업소 ]\n");
+		if(!rs.next()) System.out.printf("등록된 음식점이 없습니다.\n");
+		else System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		while(rs.next()) {//food table 가져오기
+			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		}
+		String gpr;
+		ResultSet gprr;
+		gpr="select name,address,contact from good_price_restaurant where main_menu like '%"+win_menu+"%'";
+		gprr = st.executeQuery(gpr);
+		System.out.printf("[ 착한 가격 업소 ]\n");
+		i=1;
+		if(!gprr.next()) System.out.printf("등록된 음식점이 없습니다.\n");
+		else System.out.printf("#%d %s / %s / %s\n",i++,gprr.getString(1),gprr.getString(2),gprr.getString(3));
+		while(gprr.next()) {//food table 가져오기
+			System.out.printf("#%d %s / %s / %s\n",i++,gprr.getString(1),gprr.getString(2),gprr.getString(3));
+		}
 	}
 	
 }
