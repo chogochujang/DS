@@ -49,6 +49,8 @@ public class main {
 				if(X==1)//1. world cup
 					World_cup(conn,st);
 				else if(X==2) {
+					view_chart(conn,st);
+					continue;
 					}
 				else return;
 			}
@@ -91,10 +93,18 @@ public class main {
 			}
 			System.out.printf(" |   uPW : ");
 			uPW = scan.nextLine();
-			stmt = "Insert into student values (1,'"+uName+"',"+age+",'"+address+"',"+sex+",'"+uID+"','"+uPW+"')";
+			
+			//uNUM 부여
+			String nst = "select count(*) from student";
+			ResultSet nrs= st.executeQuery(nst);
+			nrs.next();
+			int unum = nrs.getInt(1);
+			
+			stmt = "Insert into student values ("+unum+",'"+uName+"',"+age+",'"+address+"',"+sex+",'"+uID+"','"+uPW+"')";
 			st.executeUpdate(stmt);
 			System.out.println(" |           Welcome!           |");
 			System.out.println(" └------------------------------┘ ");
+			
 		}catch(SQLException ex) {
 			System.out.println("Sign_up Failed!");
 			throw ex;
@@ -263,6 +273,9 @@ public class main {
 		System.out.printf("   What is your choice? :");
 		choice = scan.nextInt()-1;
 		String win_menu = fname[match[choice]];
+		stmt = "update food set win_count = win_count + 1 where name='"+win_menu + "'";
+		st.executeUpdate(stmt);
+		
 		System.out.println("************ "+ win_menu + " WIN! ************");
 		
 		//음식점 리스트
@@ -286,6 +299,50 @@ public class main {
 		while(gprr.next()) {//food table 가져오기
 			System.out.printf("#%d %s / %s / %s\n",i++,gprr.getString(1),gprr.getString(2),gprr.getString(3));
 		}
+	}
+	public static void view_chart(Connection conn,Statement st) throws SQLException {
+		while(true) {
+			System.out.println("***********************************");
+			System.out.println(" ┌---------- 차트 확인하기 ----------┐ ");
+			System.out.println(" |          1. 전체 순위확인         | ");
+			System.out.println(" |          2. 이용자 별 순위 확인    | ");
+			System.out.println(" |          3. 뒤로 가기           | ");
+			System.out.println(" └------------------------------┘ ");
+			System.out.println("***********************************");
+			System.out.printf("select : ");
+			Scanner scan = new Scanner(System.in);
+			Integer X = scan.nextInt();
+			if(X==1) {
+				view_all_chart(conn, st);
+				continue;
+			}else if(X==2) {
+				
+			}else {
+				return;
+			}
+		}
+	}
+	public static void view_all_chart(Connection conn,Statement st)throws SQLException {
+		String stmt = "select * from food order by win_count desc";
+		System.out.println("			전체 음식 순위");
+		System.out.println("***********************************************************");
+		ResultSet rs = st.executeQuery(stmt);System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		int i = 1;
+		while(rs.next()) {
+			String name = rs.getString(1);
+			double cal = rs.getDouble(2);
+			double c = rs.getDouble(3);
+			double p = rs.getDouble(4);
+			double f = rs.getDouble(5);
+			int avg_price = rs.getInt(6);
+			int win_count = rs.getInt(7);
+			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + p + "\t" + f + "\t" + avg_price);
+			i++;
+		}
+		System.out.println("뒤로 가려면 아무 키나 누르세용");
+		Scanner scan = new Scanner(System.in);
+		String back = scan.nextLine();
+		return;
 	}
 	
 }
