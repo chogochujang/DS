@@ -2,6 +2,7 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class main {
+	static int u_num;
 	public static void main(String[] args) throws SQLException{
 		try{
 			Scanner scan = new Scanner(System.in);
@@ -46,8 +47,10 @@ public class main {
 				System.out.println("***********************************");
 				System.out.printf("select : ");
 				Integer X = scan.nextInt();
-				if(X==1)//1. world cup
+				if(X==1) {//1. world cup
 					World_cup(conn,st);
+					continue;
+				}
 				else if(X==2) {
 					view_chart(conn,st);
 					continue;
@@ -129,6 +132,8 @@ public class main {
 	
 			if(rs.next()) {
 				if(uPW.equals(rs.getString(1))) {
+					stmt = "select num from student where uID = '" + uID + "'";
+					u_num = rs.getInt(1);
 					System.out.println(" |         login SUCCESS        |");
 					System.out.println(" └------------------------------┘ ");
 	                return true;
@@ -273,9 +278,48 @@ public class main {
 		System.out.printf("   What is your choice? :");
 		choice = scan.nextInt()-1;
 		String win_menu = fname[match[choice]];
-		stmt = "update food set win_count = win_count + 1 where name='"+win_menu + "'";
-		st.executeUpdate(stmt);
-		
+		//winner table이 update 될 때 food table win_count+1 
+//		String CreateTriggerSql = "create or replace function test() returns trigger as $$"
+//				 +"begin\n"
+//			 		+ "update food\n"
+//			 		+ "set win_count = win_count+1\n"
+//			 		+"where name=New.f_name';\n"
+//			 		+"return old;\n"
+//			 		+"end;\n"
+//			 		+"$$\n"
+//			 		+"language 'plpgsql';\n"
+//				 +"create trigger R1\n"
+//		 		+ "after update of win_count on winner\n"
+//		 		+ "for each row\n"
+//		 		+ "execute procedure test();";
+//			st.executeUpdate(CreateTriggerSql);
+//		//winner table에 insert 될 때 food table win_count+1 
+//		CreateTriggerSql = "create or replace function test1() returns trigger as $$"
+//					 +"begin\n"
+//				 		+ "update food\n"
+//				 		+ "set win_count = win_count+1\n"
+//				 		+"where name=New.f_name';\n"
+//				 		+"return old;\n"
+//				 		+"end;\n"
+//				 		+"$$\n"
+//				 		+"language 'plpgsql';\n"
+//					 +"create trigger R2\n"
+//			 		+ "after insert on winner\n"
+//			 		+ "for each row\n"
+//			 		+ "execute procedure test1();";
+//		st.executeUpdate(CreateTriggerSql);
+			
+//		stmt = "update food set win_count = win_count + 1 where name='"+win_menu + "'";
+//		st.executeUpdate(stmt);
+		stmt = "select * from winner where u_num="+u_num + "and f_name='"+win_menu +"'";
+		rs = st.executeQuery(stmt);
+		if(!rs.next()) {
+			stmt = "insert into winner values('"+win_menu+"',"+u_num+",1)";
+			st.executeUpdate(stmt);
+		} else {
+			stmt = "update winner set win_count = win_count + 1 where f_name = '" + win_menu +"' and u_num =" +u_num;
+			st.executeUpdate(stmt);
+		}
 		System.out.println("************ "+ win_menu + " WIN! ************");
 		
 		//음식점 리스트
