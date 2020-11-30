@@ -1,24 +1,31 @@
 import java.sql.*;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 
 public class main {
 	static int u_num;
-	public static void main(String[] args) throws SQLException{
+	public static void main(String[] args) throws SQLException, IOException{
 		try{
 			Scanner scan = new Scanner(System.in);
 			boolean isLogedIn = false;
-			//PostgreSQL server 및 DB연결
-			String url = "jdbc:postgresql:DSDB";
-			String user = "postgres";
-			String password = "58778285";
-			
-			Connection conn = DriverManager.getConnection(url,user,password);
-			System.out.println("---Connecting PostgreSQL database---");
+			String dbacct, passwrd, url;
+			url = "jdbc:postgresql:DSDB";
+			System.out.println("Enter database account:");
+			dbacct = scan.next();
+			System.out.println("Enter password:");
+			passwrd = scan.next();
+			System.out.println("Connecting PostgreSQL database");
+			// JDBC를 이용해 PostgreSQL 서버 및 데이터베이스 연결
+			Connection conn = DriverManager.getConnection(url, dbacct, passwrd);
 
 			Statement st = conn.createStatement();
 			//String CreateSql = "create table Good_restaurant(name varchar(20), main_menu varchar(50), address varchar(50), contact varchar(20))";
 			//st.executeUpdate(CreateSql);
-			
+			create_table(conn, st);
 			//1. 로그인
 			while(!isLogedIn) {
 				System.out.println("***********************************");
@@ -387,6 +394,16 @@ public class main {
 		Scanner scan = new Scanner(System.in);
 		String back = scan.nextLine();
 		return;
+	}
+	public static void create_table(Connection conn,Statement st) throws SQLException, IOException {
+		String urlStr = "http://openapi.gwangjin.go.kr:8088/5263746654686f6f37395a67737a79/json/GwangjinModelRestaurantDesignate/1/5";
+		URL url = new URL(urlStr);// 위 urlStr을 이용해서 URL 객체를 만들어줍니다. 
+		BufferedReader bf; String line = ""; 
+		String result=""; //날씨 정보를 받아옵니다. 
+		bf = new BufferedReader(new InputStreamReader(url.openStream())); //버퍼에 있는 정보를 하나의 문자열로 변환. 
+		while((line=bf.readLine())!=null){ result=result.concat(line); // 
+		System.out.println(result); // 받아온 데이터를 확인해봅니다. }
+		}
 	}
 	
 }
