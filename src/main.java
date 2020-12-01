@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 
 public class main {
 	static int u_num;
+	static String sub_gu1, sub_gu2;
 	public static void main(String[] args) throws SQLException, IOException, ParseException{
 		try{
 			Scanner scan = new Scanner(System.in);
@@ -41,31 +42,31 @@ public class main {
 				System.out.printf("select : ");
 				Integer X = scan.nextInt();
 				if(X==1) {//1.sign up
-					create_table(conn, "Gwangjin");
-					create_table(conn, "Sd");
-					create_table(conn, "Sb");
-					create_table(conn, "Seocho","Sc");
-					create_table(conn, "Songpa","Sp","seoul");
-					create_table(conn, "Ep");
-					create_table(conn, "Gd");
-					create_table(conn, "Jongno");
-					create_table(conn, "Gangnam","Gn");
-					create_table(conn, "Dobong");
-					create_table(conn, "Mapo","Mp");
-					create_table(conn, "Geumcheon");
-					create_table(conn, "Yongsan","Ys");
-					create_table(conn, "Dongjak","Dj");
-					create_table(conn, "Gangseo","Gangseo","seoul");
-					create_table(conn, "Junggu","Junggu","seoul");
-					create_table(conn, "Ydp");
-					create_table(conn, "Guro");
-					create_table(conn, "Gangbuk","Gb");
-					create_table(conn, "Jungnang");
-					create_table(conn, "Sdm","Seodaemun");
-					create_table(conn, "Ddm","Dongdeamoon");
-					create_table(conn, "Yangcheon","Yc");
-					create_table(conn, "Nowon","Nw");
-					create_table(conn, "Gwanak","Ga");
+					create_table(conn, "Gwangjin");//광진구
+					create_table(conn, "Sd");//성동구
+					create_table(conn, "Sb");//성북구
+					create_table(conn, "Seocho","Sc");//서초구
+					create_table(conn, "Songpa","Sp","seoul");//송파구
+					create_table(conn, "Ep");//은평구
+					create_table(conn, "Gd");//강동구
+					create_table(conn, "Jongno");//종로구
+					create_table(conn, "Gangnam","Gn");//강남구
+					create_table(conn, "Dobong");//도옵구
+					create_table(conn, "Mapo","Mp");//마포구
+					create_table(conn, "Geumcheon");//금천구
+					create_table(conn, "Yongsan","Ys");//용산구
+					create_table(conn, "Dongjak","Dj");//동작구
+					create_table(conn, "Gangseo","Gangseo","seoul");//강서구
+					create_table(conn, "Junggu","Junggu","seoul");//중구
+					create_table(conn, "Ydp");//영등포구
+					create_table(conn, "Guro");//구로구
+					create_table(conn, "Gangbuk","Gb");//강북구
+					create_table(conn, "Jungnang");//중랑구
+					create_table(conn, "Sdm","Seodaemun");//서대문구
+					create_table(conn, "Ddm","Dongdeamoon");//동대문구
+					create_table(conn, "Yangcheon","Yc");//양천구
+					create_table(conn, "Nowon","Nw");//노원구
+					create_table(conn, "Gwanak","Ga");//관악구
 				}
 			
 				else if(X==2)  //2.sign in
@@ -346,28 +347,29 @@ public class main {
 			st.executeUpdate(stmt);
 		}
 		System.out.println("************ "+ win_menu + " WIN! ************");
-		
+		//구 선택
+		String gu=choose_gu();
 		//음식점 리스트
-		stmt = "select name,address,contact from good_restaurant where main_menu like '%"+win_menu+"%'";
+		stmt = "select name,address,contact from "+gu+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
 		rs = st.executeQuery(stmt);
 		i=1;
-		System.out.printf("[ 모범 업소 ]\n");
+		System.out.printf("[ 선택 구 음식점 ]\n");
 		if(!rs.next()) System.out.printf("등록된 음식점이 없습니다.\n");
 		else System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
 		while(rs.next()) {//food table 가져오기
 			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
 		}
-		String gpr;
-		ResultSet gprr;
-		gpr="select name,address,contact from good_price_restaurant where main_menu like '%"+win_menu+"%'";
-		gprr = st.executeQuery(gpr);
-		System.out.printf("[ 착한 가격 업소 ]\n");
+		//주변 구로 view 만들기
+		/*create_sub_gu_view(conn,st,gu);
+		stmt="select name,address,contact from "+gu+"_sub_view where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
+		rs = st.executeQuery(stmt);
+		System.out.printf("[ 주변 구 음식점 ]\n");
 		i=1;
-		if(!gprr.next()) System.out.printf("등록된 음식점이 없습니다.\n");
-		else System.out.printf("#%d %s / %s / %s\n",i++,gprr.getString(1),gprr.getString(2),gprr.getString(3));
-		while(gprr.next()) {//food table 가져오기
-			System.out.printf("#%d %s / %s / %s\n",i++,gprr.getString(1),gprr.getString(2),gprr.getString(3));
-		}
+		if(!rs.next()) System.out.printf("등록된 음식점이 없습니다.\n");
+		else System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		while(rs.next()) {//food table 가져오기
+			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		}*/
 	}
 	public static void view_chart(Connection conn,Statement st) throws SQLException {
 		while(true) {
@@ -697,5 +699,61 @@ public class main {
 				+ "drop trigger R2 on winner";
 		st.executeUpdate(stmt);
 	}
+	public static String choose_gu() {
+		System.out.println(" ┌---------- 당신의 선택 ----------┐");
+		System.out.println(" |             구 선택            |");
+		System.out.println(" | 1.광진구 2.성동구 3.성북구 4.서초구 |");
+		System.out.println(" | 5.송파구 6.은평구 7.강동구 8.종로구 |");
+		System.out.println(" |    9.강남구 10.도봉구 11.마포구   |");
+		System.out.println(" |   12.금천구 13.용산구 14.동작구   |");
+		System.out.println(" |   15.강서구 16.중구 17.영등포구   |");
+		System.out.println(" |   18.구로구 19.강북구 20.중랑구   |");
+		System.out.println(" |     21.서대문구 22.동대문구      |");
+		System.out.println(" |   23.양천구 24.노원구 25.관악구   |");
+		System.out.println(" └------------------------------┘");
+		System.out.println("***********************************");
+		System.out.printf("select : ");
+		Scanner scan = new Scanner(System.in);
+		Integer X = scan.nextInt();
+		if(X==1) {sub_gu1="Sd"; sub_gu2="jungnang"; return "Gwangjin";}
+		else if(X==2) {sub_gu1="Gwangjin"; sub_gu2="Ddm"; return "Sd";}
+		else if(X==3) {sub_gu1="Gangbuk"; sub_gu2="Ddm"; return "Sb";}
+		else if(X==4) {sub_gu1="Gangnam"; sub_gu2="Dongjak"; return "Seocho";}
+		else if(X==5) {sub_gu1="Gangnam"; sub_gu2="Gd"; return "Songpa";}
+		else if(X==6) {sub_gu1="Jongno"; sub_gu2="Sdm"; return "Ep";}
+		else if(X==7) {sub_gu1="Songpa"; sub_gu2="Gwangjin"; return "Gd";}
+		else if(X==8) {sub_gu1="Sb"; sub_gu2="Sdm"; return "Jongno";}
+		else if(X==9) {sub_gu1="Seocho"; sub_gu2="Songpa"; return "Gangnam";}
+		else if(X==10) {sub_gu1="Gangbuk"; sub_gu2="Nowon"; return "Dobong";}
+		else if(X==11) {sub_gu1="Sdm"; sub_gu2="Yongsan"; return "Mapo";}
+		else if(X==12) {sub_gu1="Gwanak"; sub_gu2="Guro"; return "Geumcheon";}
+		else if(X==13) {sub_gu1="Mapo"; sub_gu2="Junggu"; return "Yongsan";}
+		else if(X==14) {sub_gu1="Gwanak"; sub_gu2="Ydp"; return "Dongjak";}
+		else if(X==15) {sub_gu1="Yangcheon"; sub_gu2="Mapo"; return "Gangseo";}
+		else if(X==16) {sub_gu1="Yongsan"; sub_gu2="Jongno"; return "Junggu";}
+		else if(X==17) {sub_gu1="Dongjak"; sub_gu2="Guro"; return "Ydp";}
+		else if(X==18) {sub_gu1="Yangcheon"; sub_gu2="Gangseo"; return "Guro";}
+		else if(X==19) {sub_gu1="Dobong"; sub_gu2="Sb"; return "Gangbuk";}
+		else if(X==20) {sub_gu1="Ddm"; sub_gu2="Nowon"; return "Jungnang";}
+		else if(X==21) {sub_gu1="Mapo"; sub_gu2="Jongno"; return "Sdm";}
+		else if(X==22) {sub_gu1="Sb"; sub_gu2="Jungnang"; return "Ddm";}
+		else if(X==23) {sub_gu1="Gangseo"; sub_gu2="Guro"; return "Yangcheon";}
+		else if(X==24) {sub_gu1="Dobong"; sub_gu2="Jungnang"; return "Nowon";}
+		else if(X==25) {sub_gu1="Dongjak"; sub_gu2="Geumcheon"; return "Gwanak";}
+		else return null;
+	}
+	/*public static void create_sub_gu_view(Connection conn, Statement st, String gu) throws SQLException 
+	{
+		String stmt = "select * from "+gu+"_sub_view";
+		ResultSet rs = st.executeQuery(stmt);
+		if(!rs.next()) {
+				String createViewSql = "create view "+gu+"_sub_view as\n"
+						+ "select name, main_menu, address, contact\n"
+						+ "from (select name, main_menu, address, contact from "+sub_gu1+"\n"
+								+ "union\n"
+								+ "select name, main_menu, address, contact from "+sub_gu2+");";
+				st.executeUpdate(createViewSql);
+		}
+	}*/
 	
 }
