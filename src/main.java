@@ -373,10 +373,11 @@ public class main {
 		while(true) {
 			System.out.println("***********************************");
 			System.out.println(" ┌---------- 차트 확인하기 ----------┐ ");
-			System.out.println(" |          1. 전체 순위확인         | ");
-			System.out.println(" |          2. 이용자 별 순위 확인    | ");
-			System.out.println(" |          3. 뒤로 가기           | ");
-			System.out.println(" └------------------------------┘ ");
+			System.out.println(" |          1. 전체 순위확인       	  | ");
+			System.out.println(" |          2. 내가 뽑은 순위확인	  | ");
+			System.out.println(" |          3. 이용자 별 순위 확인 	  | ");
+			System.out.println(" |          4. 뒤로 가기         	  | ");
+			System.out.println(" └--------------------------------┘ ");
 			System.out.println("***********************************");
 			System.out.printf("select : ");
 			Scanner scan = new Scanner(System.in);
@@ -384,8 +385,12 @@ public class main {
 			if(X==1) {
 				view_all_chart(conn, st);
 				continue;
-			}else if(X==2) {
-				
+			}else if (X==2) {
+				view_my_chart(conn, st);
+				continue;
+			}else if(X==3) {
+				view_part_chart(conn, st);
+				continue;
 			}else {
 				return;
 			}
@@ -395,7 +400,8 @@ public class main {
 		String stmt = "select * from food order by win_count desc";
 		System.out.println("			전체 음식 순위");
 		System.out.println("***********************************************************");
-		ResultSet rs = st.executeQuery(stmt);System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		ResultSet rs = st.executeQuery(stmt);
+		System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
 		int i = 1;
 		while(rs.next()) {
 			String name = rs.getString(1);
@@ -412,6 +418,113 @@ public class main {
 		Scanner scan = new Scanner(System.in);
 		String back = scan.nextLine();
 		return;
+	}
+	
+	public static void view_my_chart(Connection conn, Statement st) throws SQLException {
+		String stmt = "select *"
+				+ "from food"
+				+ "where name in (select f_name"
+				+ "	from winner"
+				+ "	where u_num = ?)"
+				+ "order by win_count desc";
+		System.out.println("			내가 뽑은 음식 순위");
+		System.out.println("***********************************************************");
+		ResultSet rs = st.executeQuery(stmt);
+		PreparedStatement p = conn.prepareStatement(stmt);
+		p.clearParameters();
+		p.setInt(1, u_num);
+		rs = p.executeQuery();
+		System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		int i = 1;
+		while(rs.next()) {
+			String name = rs.getString(1);
+			double cal = rs.getDouble(2);
+			double c = rs.getDouble(3);
+			double protein = rs.getDouble(4);
+			double f = rs.getDouble(5);
+			int avg_price = rs.getInt(6);
+			int win_count = rs.getInt(7);
+			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
+			i++;
+		}
+		System.out.println("뒤로 가려면 아무 키나 누르세용");
+		Scanner scan = new Scanner(System.in);
+		String back = scan.nextLine();
+		return;
+	}
+	
+	public static void view_part_chart(Connection conn, Statement st) throws SQLException {
+		while(true) {
+			int sex, max, min;
+			Scanner scan = new Scanner(System.in);
+			PreparedStatement p;
+			ResultSet r;
+			System.out.println("***********************************");
+			System.out.println(" ┌---------- 이용자 별 순위 확인 ----------┐ ");
+			System.out.println("그룹의 성별을 고르세용 (남성 : 1, 여성 : 2, 성별 무관: 3");
+			sex = scan.nextInt();
+			System.out.println("그룹의 최소 나이를 입력하세용");
+			min = scan.nextInt();
+			System.out.println("그룹의 최대 나이를 입력하세용");
+			max = scan.nextInt();
+			String stmt;
+			if(sex != 1 && sex !=2) {
+				System.out.println(min+"세 이상"+max+"세 이하 음식 순위");
+				stmt = "select *"
+						+ "from food"
+						+ "where name in (select f_name"
+						+ "	from winner"
+						+ "	where u_num in (select number"
+						+ "		from user"
+						+ "		where age >= ? and age <= ?))"
+						+ "order by win_count desc;";
+			} else {
+				if(sex == 1) {
+					System.out.println("남성" + min+"세 이상"+max+"세 이하 음식 순위");
+				}else {
+					System.out.println("여성" + min+"세 이상"+max+"세 이하 음식 순위");
+				}
+				stmt = "select *"
+						+ "from food"
+						+ "where name in (select f_name"
+						+ "	from winner"
+						+ "	where u_num in (select number"
+						+ "		from user"
+						+ "		where sex = ? and age >= ? and age <= ?))"
+						+ "order by win_count desc;";
+			}
+			p = conn.prepareStatement(stmt);
+			p.clearParameters();
+			p.setInt(1, sex);
+			p.setInt(2, min);
+			p.setInt(3, max);
+			r = p.executeQuery();
+			System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+			int i = 1;
+			while(r.next()) {
+				String name = r.getString(1);
+				double cal = r.getDouble(2);
+				double c = r.getDouble(3);
+				double protein = r.getDouble(4);
+				double f = r.getDouble(5);
+				int avg_price = r.getInt(6);
+				int win_count = r.getInt(7);
+				System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
+				i++;
+			}
+			System.out.println("***********************************");
+			System.out.println(" ┌--------------------------------┐ ");
+			System.out.println(" |          1. 다른그룹 순위 확인   	  | ");
+			System.out.println(" |          2. 뒤로 가기			  | ");
+			System.out.println(" └--------------------------------┘ ");
+			System.out.println("***********************************");
+			Integer X = scan.nextInt();
+			if(X==1) {
+				continue;
+			} else {
+				return;
+			}
+		}
 	}
 	public static void create_table(Connection conn, String gu) throws SQLException, IOException, ParseException {
 		String stmt = "create table "+ gu +" (name varchar(50),snt varchar(20), main_menu varchar(20), address varchar(100), contact varchar(20))";
