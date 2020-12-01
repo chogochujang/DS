@@ -359,6 +359,18 @@ public class main {
 		while(rs.next()) {//food table 가져오기
 			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
 		}
+		// 주변 구 음식점 (union)
+		stmt = "select name,address,contact from "+sub_gu1+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
+				+ "union\n"
+				+ "select name,address,contact from "+sub_gu2+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
+						+ "order by address";
+		rs = st.executeQuery(stmt);
+		System.out.printf("[ 주변 구 음식점 ]\n");
+		if(!rs.next()) System.out.printf("등록된 음식점이 없습니다.\n");
+		else System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		while(rs.next()) {//food table 가져오기
+			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
+		}
 		//주변 구로 view 만들기
 		/*create_sub_gu_view(conn,st,gu);
 		stmt="select name,address,contact from "+gu+"_sub_view where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
@@ -423,31 +435,37 @@ public class main {
 	}
 	
 	public static void view_my_chart(Connection conn, Statement st) throws SQLException {
-		String stmt = "select *"
-				+ "from food"
-				+ "where name in (select f_name"
-				+ "	from winner"
-				+ "	where u_num = ?)"
-				+ "order by win_count desc";
+//		String stmt = "select *\n"
+//				+ "from food\n"
+//				+ "where name in (select f_name from winner where u_num ="+u_num+")\n"
+//				+ "order by win_count desc";
+		String stmt = "select f_name, win_count\n"
+				+ "from winner\n"
+				+ "where u_num ="+u_num+"\n"
+						+ "order by win_count desc";
 		System.out.println("			내가 뽑은 음식 순위");
 		System.out.println("***********************************************************");
 		ResultSet rs = st.executeQuery(stmt);
-		PreparedStatement p = conn.prepareStatement(stmt);
-		p.clearParameters();
-		p.setInt(1, u_num);
-		rs = p.executeQuery();
-		System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+//		PreparedStatement p = conn.prepareStatement(stmt);
+//		p.clearParameters();
+//		p.setInt(1, u_num);
+//		rs = p.executeQuery();
+//		System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		System.out.println("순위\t우승횟수\t이름");
 		int i = 1;
+//		while(rs.next()) {
+//			String name = rs.getString(1);
+//			double cal = rs.getDouble(2);
+//			double c = rs.getDouble(3);
+//			double protein = rs.getDouble(4);
+//			double f = rs.getDouble(5);
+//			int avg_price = rs.getInt(6);
+//			int win_count = rs.getInt(7);
+//			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
+//			i++;
+//		}
 		while(rs.next()) {
-			String name = rs.getString(1);
-			double cal = rs.getDouble(2);
-			double c = rs.getDouble(3);
-			double protein = rs.getDouble(4);
-			double f = rs.getDouble(5);
-			int avg_price = rs.getInt(6);
-			int win_count = rs.getInt(7);
-			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
-			i++;
+			System.out.println(i+"\t"+rs.getInt(2)+"\t"+rs.getString(1));i++;
 		}
 		System.out.println("뒤로 가려면 아무 키나 누르세용");
 		Scanner scan = new Scanner(System.in);
@@ -472,13 +490,12 @@ public class main {
 			String stmt;
 			if(sex != 1 && sex !=2) {
 				System.out.println(min+"세 이상"+max+"세 이하 음식 순위");
-				stmt = "select *"
-						+ "from food"
-						+ "where name in (select f_name"
-						+ "	from winner"
-						+ "	where u_num in (select number"
-						+ "		from user"
-						+ "		where age >= ? and age <= ?))"
+				stmt = "select *\n"
+						+ "from food\n"
+						+ "where name in (select f_name from winner"
+						+ "	where u_num in (select u_num"
+						+ "		from student"
+						+ "		where age >= "+min+" and age <= "+max+" ))"
 						+ "order by win_count desc;";
 			} else {
 				if(sex == 1) {
@@ -486,22 +503,22 @@ public class main {
 				}else {
 					System.out.println("여성" + min+"세 이상"+max+"세 이하 음식 순위");
 				}
-				stmt = "select *"
-						+ "from food"
-						+ "where name in (select f_name"
-						+ "	from winner"
-						+ "	where u_num in (select number"
-						+ "		from user"
-						+ "		where sex = ? and age >= ? and age <= ?))"
+				stmt = "select *\n"
+						+ "from food\n"
+						+ "where name in (select f_name from winner"
+						+ "	where u_num in (select u_num"
+						+ "		from student"
+						+ "		where sex = "+sex+" and age >= "+min+" and age <= "+max+" ))"
 						+ "order by win_count desc;";
 			}
-			p = conn.prepareStatement(stmt);
-			p.clearParameters();
-			p.setInt(1, sex);
-			p.setInt(2, min);
-			p.setInt(3, max);
-			r = p.executeQuery();
-			System.out.println("순위	\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+//			p = conn.prepareStatement(stmt);
+//			p.clearParameters();
+//			p.setInt(1, sex);
+//			p.setInt(2, min);
+//			p.setInt(3, max);
+//			r = p.executeQuery();
+			r = st.executeQuery(stmt);
+			System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
 			int i = 1;
 			while(r.next()) {
 				String name = r.getString(1);
