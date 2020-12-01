@@ -4,18 +4,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 public class main {
 	static int u_num;
-	public static void main(String[] args) throws SQLException, IOException{
+	public static void main(String[] args) throws SQLException, IOException, ParseException{
 		try{
 			Scanner scan = new Scanner(System.in);
 			boolean isLogedIn = false;
 			String dbacct, passwrd, url;
 			url = "jdbc:postgresql:DSDB";
-			System.out.println("Enter database account:");
-			dbacct = scan.next();
+			dbacct = "postgres";
 			System.out.println("Enter password:");
 			passwrd = scan.next();
 			System.out.println("Connecting PostgreSQL database");
@@ -25,7 +28,54 @@ public class main {
 			Statement st = conn.createStatement();
 			//String CreateSql = "create table Good_restaurant(name varchar(20), main_menu varchar(50), address varchar(50), contact varchar(20))";
 			//st.executeUpdate(CreateSql);
-			create_table(conn, st);
+			while(true) {
+				System.out.println("***********************************");
+				System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
+				System.out.println(" |          1. table추가         | ");
+				System.out.println(" |          2. table삭제         | ");
+				System.out.println(" |          3. trigger추가       | ");
+				System.out.println(" |          4. trigger삭제       | ");
+				System.out.println(" |          5. next             | ");
+				System.out.println(" └------------------------------┘ ");
+				System.out.println("***********************************");
+				System.out.printf("select : ");
+				Integer X = scan.nextInt();
+				if(X==1) {//1.sign up
+					create_table(conn, "Gwangjin");
+					create_table(conn, "Sd");
+					create_table(conn, "Sb");
+					create_table(conn, "Seocho","Sc");
+					create_table(conn, "Songpa","Sp","seoul");
+					create_table(conn, "Ep");
+					create_table(conn, "Gd");
+					create_table(conn, "Jongno");
+					create_table(conn, "Gangnam","Gn");
+					create_table(conn, "Dobong");
+					create_table(conn, "Mapo","Mp");
+					create_table(conn, "Geumcheon");
+					create_table(conn, "Yongsan","Ys");
+					create_table(conn, "Dongjak","Dj");
+					create_table(conn, "Gangseo","Gangseo","seoul");
+					create_table(conn, "Junggu","Junggu","seoul");
+					create_table(conn, "Ydp");
+					create_table(conn, "Guro");
+					create_table(conn, "Gangbuk","Gb");
+					create_table(conn, "Jungnang");
+					create_table(conn, "Sdm","Seodaemun");
+					create_table(conn, "Ddm","Dongdeamoon");
+					create_table(conn, "Yangcheon","Yc");
+					create_table(conn, "Nowon","Nw");
+					create_table(conn, "Gwanak","Ga");
+				}
+			
+				else if(X==2)  //2.sign in
+					drop_table(conn,st);
+				else if(X==3)
+					create_trigger(conn,st);
+				else if(X==4)
+					drop_trigger(conn,st);
+				else break;
+			}
 			//1. 로그인
 			while(!isLogedIn) {
 				System.out.println("***********************************");
@@ -42,9 +92,10 @@ public class main {
 				else if(X==2)  //2.sign in
 					isLogedIn=Sign_in(conn,st);
 				else return;
+				continue;
 			}
 			//2. 로그인 후 기능사용
-			while(true) {
+			while(isLogedIn) {
 				System.out.println("***********************************");
 				System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
 				System.out.println(" |          1. world cup        | ");
@@ -285,39 +336,6 @@ public class main {
 		System.out.printf("   What is your choice? :");
 		choice = scan.nextInt()-1;
 		String win_menu = fname[match[choice]];
-		//winner table이 update 될 때 food table win_count+1 
-//		String CreateTriggerSql = "create or replace function test() returns trigger as $$"
-//				 +"begin\n"
-//			 		+ "update food\n"
-//			 		+ "set win_count = win_count+1\n"
-//			 		+"where name=New.f_name';\n"
-//			 		+"return old;\n"
-//			 		+"end;\n"
-//			 		+"$$\n"
-//			 		+"language 'plpgsql';\n"
-//				 +"create trigger R1\n"
-//		 		+ "after update of win_count on winner\n"
-//		 		+ "for each row\n"
-//		 		+ "execute procedure test();";
-//			st.executeUpdate(CreateTriggerSql);
-//		//winner table에 insert 될 때 food table win_count+1 
-//		CreateTriggerSql = "create or replace function test1() returns trigger as $$"
-//					 +"begin\n"
-//				 		+ "update food\n"
-//				 		+ "set win_count = win_count+1\n"
-//				 		+"where name=New.f_name';\n"
-//				 		+"return old;\n"
-//				 		+"end;\n"
-//				 		+"$$\n"
-//				 		+"language 'plpgsql';\n"
-//					 +"create trigger R2\n"
-//			 		+ "after insert on winner\n"
-//			 		+ "for each row\n"
-//			 		+ "execute procedure test1();";
-//		st.executeUpdate(CreateTriggerSql);
-			
-//		stmt = "update food set win_count = win_count + 1 where name='"+win_menu + "'";
-//		st.executeUpdate(stmt);
 		stmt = "select * from winner where u_num="+u_num + "and f_name='"+win_menu +"'";
 		rs = st.executeQuery(stmt);
 		if(!rs.next()) {
@@ -395,15 +413,176 @@ public class main {
 		String back = scan.nextLine();
 		return;
 	}
-	public static void create_table(Connection conn,Statement st) throws SQLException, IOException {
-		String urlStr = "http://openapi.gwangjin.go.kr:8088/5263746654686f6f37395a67737a79/json/GwangjinModelRestaurantDesignate/1/5";
-		URL url = new URL(urlStr);// 위 urlStr을 이용해서 URL 객체를 만들어줍니다. 
+	public static void create_table(Connection conn, String gu) throws SQLException, IOException, ParseException {
+		String stmt = "create table "+ gu +" (name varchar(50),snt varchar(20), main_menu varchar(20), address varchar(100), contact varchar(20))";
+		PreparedStatement p = conn.prepareStatement(stmt);
+		p.executeUpdate();
+		String urlStr = "http://openapi."+gu+".go.kr:8088/5263746654686f6f37395a67737a79/json/"+gu+"ModelRestaurantDesignate/1/1000";
+		URL url = new URL(urlStr);
 		BufferedReader bf; String line = ""; 
-		String result=""; //날씨 정보를 받아옵니다. 
-		bf = new BufferedReader(new InputStreamReader(url.openStream())); //버퍼에 있는 정보를 하나의 문자열로 변환. 
-		while((line=bf.readLine())!=null){ result=result.concat(line); // 
-		System.out.println(result); // 받아온 데이터를 확인해봅니다. }
+		String result="";
+		bf = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+		while((line=bf.readLine())!=null){
+			result=result.concat(line);
 		}
+		JSONParser parser = new JSONParser();
+		JSONObject obj = (JSONObject) parser.parse(result);
+		JSONObject tong = (JSONObject) obj.get(gu+"ModelRestaurantDesignate");
+		int list_count = ((Long)tong.get("list_total_count")).intValue();
+		JSONArray rows = (JSONArray) tong.get("row");
+		for(int i = 0; i < list_count; i++) {
+			JSONObject row = (JSONObject) rows.get(i);
+			String name = (String) row.get("UPSO_NM");
+			String address = (String) row.get("SITE_ADDR_RD");
+			String main_menu = (String) row.get("MAIN_EDF");
+			String contact = (String) row.get("UPSO_SITE_TELNO");
+			String snt = (String) row.get("SNT_UPTAE_NM");
+			stmt = "insert into "+gu+" values (?, ?, ?, ?,?)";
+			p = conn.prepareStatement(stmt);
+			p.clearParameters();
+			p.setString(1, name);
+			p.setString(2, snt);
+			p.setString(3, main_menu);
+			p.setString(4, address);
+			p.setString(5, contact);
+			p.executeUpdate();
+		}
+	}
+	public static void create_table(Connection conn, String gu1, String gu2) throws SQLException, IOException, ParseException {
+		String stmt = "create table "+ gu1 +" (name varchar(50),snt varchar(20), main_menu varchar(20), address varchar(100), contact varchar(20))";
+		PreparedStatement p = conn.prepareStatement(stmt);
+		p.executeUpdate();
+		String urlStr = "http://openapi."+gu1+".go.kr:8088/5263746654686f6f37395a67737a79/json/"+gu2+"ModelRestaurantDesignate/1/1000";
+		URL url = new URL(urlStr);
+		BufferedReader bf; String line = ""; 
+		String result="";
+		bf = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+		while((line=bf.readLine())!=null){
+			result=result.concat(line);
+		}
+		JSONParser parser = new JSONParser();
+		JSONObject obj = (JSONObject) parser.parse(result);
+		JSONObject tong = (JSONObject) obj.get(gu2+"ModelRestaurantDesignate");
+		int list_count = ((Long)tong.get("list_total_count")).intValue();
+		JSONArray rows = (JSONArray) tong.get("row");
+		for(int i = 0; i < list_count; i++) {
+			JSONObject row = (JSONObject) rows.get(i);
+			String name = (String) row.get("UPSO_NM");
+			String address = (String) row.get("SITE_ADDR_RD");
+			String main_menu = (String) row.get("MAIN_EDF");
+			String contact = (String) row.get("UPSO_SITE_TELNO");
+			String snt = (String) row.get("SNT_UPTAE_NM");
+			stmt = "insert into "+gu1+" values (?, ?, ?, ?,?)";
+			p = conn.prepareStatement(stmt);
+			p.clearParameters();
+			p.setString(1, name);
+			p.setString(2, snt);
+			p.setString(3, main_menu);
+			p.setString(4, address);
+			p.setString(5, contact);
+			p.executeUpdate();
+		}
+	}
+	public static void create_table(Connection conn, String gu1, String gu2, String go) throws SQLException, IOException, ParseException {
+		String stmt = "create table "+ gu1 +" (name varchar(50),snt varchar(20), main_menu varchar(20), address varchar(100), contact varchar(20))";
+		PreparedStatement p = conn.prepareStatement(stmt);
+		p.executeUpdate();
+		String urlStr = "http://openapi."+gu1+"."+go+".kr:8088/5263746654686f6f37395a67737a79/json/"+gu2+"ModelRestaurantDesignate/1/1000";
+		URL url = new URL(urlStr);
+		BufferedReader bf; String line = ""; 
+		String result="";
+		bf = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+		while((line=bf.readLine())!=null){
+			result=result.concat(line);
+		}
+		JSONParser parser = new JSONParser();
+		JSONObject obj = (JSONObject) parser.parse(result);
+		JSONObject tong = (JSONObject) obj.get(gu2+"ModelRestaurantDesignate");
+		int list_count = ((Long)tong.get("list_total_count")).intValue();
+		JSONArray rows = (JSONArray) tong.get("row");
+		for(int i = 0; i < list_count; i++) {
+			JSONObject row = (JSONObject) rows.get(i);
+			String name = (String) row.get("UPSO_NM");
+			String address = (String) row.get("SITE_ADDR_RD");
+			String main_menu = (String) row.get("MAIN_EDF");
+			String contact = (String) row.get("UPSO_SITE_TELNO");
+			String snt = (String) row.get("SNT_UPTAE_NM");
+			stmt = "insert into "+gu1+" values (?, ?, ?, ?, ?)";
+			p = conn.prepareStatement(stmt);
+			p.clearParameters();
+			p.setString(1, name);
+			p.setString(2, snt);
+			p.setString(3, main_menu);
+			p.setString(4, address);
+			p.setString(5, contact);
+			p.executeUpdate();
+		}
+	}
+	public static void drop_table(Connection conn, Statement st) throws SQLException {
+		String stmt = "drop table Gwangjin cascade;"
+				+ "drop table Sd cascade;"
+				+ "drop table Sb cascade;"
+				+ "drop table Seocho cascade;"
+				+ "drop table Songpa cascade;"
+				+ "drop table Ep cascade;"
+				+ "drop table Gd cascade;"
+				+ "drop table Jongno cascade;"
+				+ "drop table Gangnam cascade;"
+				+ "drop table Dobong cascade;"
+				+ "drop table Mapo cascade;"
+				+ "drop table Geumcheon cascade;"
+				+ "drop table Yongsan cascade;"
+				+ "drop table Dongjak cascade;"
+				+ "drop table Gangseo cascade;"
+				+ "drop table Junggu cascade;"
+				+ "drop table Ydp cascade;"
+				+ "drop table Guro cascade;"
+				+ "drop table Gangbuk cascade;"
+				+ "drop table Jungnang cascade;"
+				+ "drop table Sdm cascade;"
+				+ "drop table Ddm cascade;"
+				+ "drop table Yangcheon cascade;"
+				+ "drop table Nowon cascade;"
+				+ "drop table Gwanak cascade;";
+
+		st.execute(stmt);
+	}
+	public static void create_trigger(Connection conn, Statement st) throws SQLException {
+		//winner table이 update 될 때 food table win_count+1 
+		String CreateTriggerSql = "create or replace function test() returns trigger as $$"
+				 +"begin\n"
+			 		+ "update food\n"
+			 		+ "set win_count = win_count+1\n"
+			 		+"where name=New.f_name;\n"
+			 		+"return old;\n"
+			 		+"end;\n"
+			 		+"$$\n"
+			 		+"language 'plpgsql';\n"
+				 +"create trigger R1\n"
+		 		+ "after update of win_count on winner\n"
+		 		+ "for each row\n"
+		 		+ "execute procedure test();";
+			st.executeUpdate(CreateTriggerSql);
+		//winner table에 insert 될 때 food table win_count+1 
+		CreateTriggerSql = "create or replace function test1() returns trigger as $$"
+					 +"begin\n"
+				 		+ "update food\n"
+				 		+ "set win_count = win_count+1\n"
+				 		+"where name=New.f_name;\n"
+				 		+"return old;\n"
+				 		+"end;\n"
+				 		+"$$\n"
+				 		+"language 'plpgsql';\n"
+					 +"create trigger R2\n"
+			 		+ "after insert on winner\n"
+			 		+ "for each row\n"
+			 		+ "execute procedure test1();";
+		st.executeUpdate(CreateTriggerSql);
+	}
+	public static void drop_trigger(Connection conn, Statement st) throws SQLException {
+		String stmt = "drop trigger R1 on winner;"
+				+ "drop trigger R2 on winner";
+		st.executeUpdate(stmt);
 	}
 	
 }
