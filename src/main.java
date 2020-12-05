@@ -12,11 +12,13 @@ import org.json.simple.parser.ParseException;
 
 public class main {
 	static int u_num;
+	static boolean admin = false;
 	static String sub_gu1, sub_gu2;
 	public static void main(String[] args) throws SQLException, IOException, ParseException{
 		try{
 			Scanner scan = new Scanner(System.in);
 			boolean isLogedIn = false;
+			
 			String dbacct, passwrd, url;
 			url = "jdbc:postgresql:DSDB";
 			dbacct = "postgres";
@@ -29,54 +31,7 @@ public class main {
 			Statement st = conn.createStatement();
 			//String CreateSql = "create table Good_restaurant(name varchar(20), main_menu varchar(50), address varchar(50), contact varchar(20))";
 			//st.executeUpdate(CreateSql);
-			while(true) {
-				System.out.println("***********************************");
-				System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
-				System.out.println(" |          1. table추가         | ");
-				System.out.println(" |          2. table삭제         | ");
-				System.out.println(" |          3. trigger추가       | ");
-				System.out.println(" |          4. trigger삭제       | ");
-				System.out.println(" |          5. next             | ");
-				System.out.println(" └------------------------------┘ ");
-				System.out.println("***********************************");
-				System.out.printf("select : ");
-				Integer X = scan.nextInt();
-				if(X==1) {//1.sign up
-					create_table(conn, "Gwangjin");//광진구
-					create_table(conn, "Sd");//성동구
-					create_table(conn, "Sb");//성북구
-					create_table(conn, "Seocho","Sc");//서초구
-					create_table(conn, "Songpa","Sp","seoul");//송파구
-					create_table(conn, "Ep");//은평구
-					create_table(conn, "Gd");//강동구
-					create_table(conn, "Jongno");//종로구
-					create_table(conn, "Gangnam","Gn");//강남구
-					create_table(conn, "Dobong");//도옵구
-					create_table(conn, "Mapo","Mp");//마포구
-					create_table(conn, "Geumcheon");//금천구
-					create_table(conn, "Yongsan","Ys");//용산구
-					create_table(conn, "Dongjak","Dj");//동작구
-					create_table(conn, "Gangseo","Gangseo","seoul");//강서구
-					create_table(conn, "Junggu","Junggu","seoul");//중구
-					create_table(conn, "Ydp");//영등포구
-					create_table(conn, "Guro");//구로구
-					create_table(conn, "Gangbuk","Gb");//강북구
-					create_table(conn, "Jungnang");//중랑구
-					create_table(conn, "Sdm","Seodaemun");//서대문구
-					create_table(conn, "Ddm","Dongdeamoon");//동대문구
-					create_table(conn, "Yangcheon","Yc");//양천구
-					create_table(conn, "Nowon","Nw");//노원구
-					create_table(conn, "Gwanak","Ga");//관악구
-				}
 			
-				else if(X==2)  //2.sign in
-					drop_table(conn,st);
-				else if(X==3)
-					create_trigger(conn,st);
-				else if(X==4)
-					drop_trigger(conn,st);
-				else break;
-			}
 			//1. 로그인
 			while(!isLogedIn) {
 				System.out.println("***********************************");
@@ -96,25 +51,103 @@ public class main {
 				continue;
 			}
 			//2. 로그인 후 기능사용
-			while(isLogedIn) {
-				System.out.println("***********************************");
-				System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
-				System.out.println(" |          1. world cup        | ");
-				System.out.println(" |          2. view chart       | ");
-				System.out.println(" |          3. exit             | ");
-				System.out.println(" └------------------------------┘ ");
-				System.out.println("***********************************");
-				System.out.printf("select : ");
-				Integer X = scan.nextInt();
-				if(X==1) {//1. world cup
-					World_cup(conn,st);
-					continue;
-				}
-				else if(X==2) {
-					view_chart(conn,st);
-					continue;
+			
+			if(admin)
+			{
+				while(isLogedIn) {
+					System.out.println("***********************************");
+					System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
+					System.out.println(" |          1. setting          | ");
+					System.out.println(" |          2. world cup        | ");
+					System.out.println(" |          3. view chart       | ");
+					System.out.println(" |          4. exit             | ");
+					System.out.println(" └------------------------------┘ ");
+					System.out.println("***********************************");
+					System.out.printf("select : ");
+					Integer X = scan.nextInt();
+					if(X==1) {//1. world cup
+						while(true) {
+							System.out.println("***********************************");
+							System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
+							System.out.println(" |          1. table추가         | ");
+							System.out.println(" |          2. table삭제         | ");
+							System.out.println(" |          3. trigger추가       | ");
+							System.out.println(" |          4. trigger삭제       | ");
+							System.out.println(" |          5. next             | ");
+							System.out.println(" └------------------------------┘ ");
+							System.out.println("***********************************");
+							System.out.printf("select : ");
+							X = scan.nextInt();
+							if(X==1) {//1.sign up
+								create_table(conn, "Gwangjin");//광진구
+								create_table(conn, "Sd");//성동구
+								create_table(conn, "Sb");//성북구
+								create_table(conn, "Seocho","Sc");//서초구
+								create_table(conn, "Songpa","Sp","seoul");//송파구
+								create_table(conn, "Ep");//은평구
+								create_table(conn, "Gd");//강동구
+								create_table(conn, "Jongno");//종로구
+								create_table(conn, "Gangnam","Gn");//강남구
+								create_table(conn, "Dobong");//도옵구
+								create_table(conn, "Mapo","Mp");//마포구
+								create_table(conn, "Geumcheon");//금천구
+								create_table(conn, "Yongsan","Ys");//용산구
+								create_table(conn, "Dongjak","Dj");//동작구
+								create_table(conn, "Gangseo","Gangseo","seoul");//강서구
+								create_table(conn, "Junggu","Junggu","seoul");//중구
+								create_table(conn, "Ydp");//영등포구
+								create_table(conn, "Guro");//구로구
+								create_table(conn, "Gangbuk","Gb");//강북구
+								create_table(conn, "Jungnang");//중랑구
+								create_table(conn, "Sdm","Seodaemun");//서대문구
+								create_table(conn, "Ddm","Dongdeamoon");//동대문구
+								create_table(conn, "Yangcheon","Yc");//양천구
+								create_table(conn, "Nowon","Nw");//노원구
+								create_table(conn, "Gwanak","Ga");//관악구
+							}
+							else if(X==2)  //2.sign in
+								drop_table(conn,st);
+							else if(X==3)
+								create_trigger(conn,st);
+							else if(X==4)
+								drop_trigger(conn,st);
+							else break;
+						}
+						continue;
 					}
-				else return;
+					else if(X==2) {
+						World_cup(conn,st);
+						continue;
+						}
+					else if(X==3) {
+						view_chart(conn,st);
+						continue;
+					}
+					else return;
+				}
+			}
+			else
+			{
+				while(isLogedIn) {
+					System.out.println("***********************************");
+					System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
+					System.out.println(" |          1. world cup        | ");
+					System.out.println(" |          2. view chart       | ");
+					System.out.println(" |          3. exit             | ");
+					System.out.println(" └------------------------------┘ ");
+					System.out.println("***********************************");
+					System.out.printf("select : ");
+					Integer X = scan.nextInt();
+					if(X==1) {//1. world cup
+						World_cup(conn,st);
+						continue;
+					}
+					else if(X==2) {
+						view_chart(conn,st);
+						continue;
+						}
+					else return;
+				}
 			}
 		} catch(SQLException ex)
 		{
@@ -144,6 +177,7 @@ public class main {
 			while(true) {//ID Duplicate 처리
 				System.out.printf(" |   uID : ");
 				uID = scan.nextLine();
+				//uID = scan.nextLine();
 				stmt = "select count(*) from student where uID = '"+uID+"';";
 				rs=st.executeQuery(stmt);
 				rs.next();
@@ -193,6 +227,7 @@ public class main {
 				if(uPW.equals(rs.getString(1))) {
 					stmt = "select num from student where uID = '" + uID + "'";
 					u_num = rs.getInt(1);
+					if(u_num==0||u_num==1) admin=true;
 					System.out.println(" |         login SUCCESS        |");
 					System.out.println(" └------------------------------┘ ");
 	                return true;
@@ -200,8 +235,11 @@ public class main {
 				else {
 					System.out.println(" |         WRONG password       |");
 					System.out.println(" └------------------------------┘ ");
+					return false;
 				}
 			}
+			System.out.println(" |         login Failed         |");
+			System.out.println(" └------------------------------┘ ");
 			return false;
 		}catch(SQLException ex) {
 			System.out.println("Sign_in Failed!");
@@ -243,6 +281,7 @@ public class main {
 				if(rand[i]==rand[j]) {i--; break;}
 			}
 		}
+		String gu=choose_gu();//구 선택
 		System.out.println("***********************************");
 		System.out.println(" ----------- 당신의 선택 -----------");
 		System.out.println("               16강               ");
@@ -348,7 +387,7 @@ public class main {
 		}
 		System.out.println("************ "+ win_menu + " WIN! ************");
 		//구 선택
-		String gu=choose_gu();
+		
 		//음식점 리스트
 		stmt = "select name,address,contact from "+gu+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
 		rs = st.executeQuery(stmt);
@@ -773,4 +812,6 @@ public class main {
 		}
 	}*/
 	
+	
 }
+
