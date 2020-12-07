@@ -22,7 +22,7 @@ public class main {
 			String dbacct, passwrd, url;
 			url = "jdbc:postgresql:DSDB";
 			dbacct = "postgres";
-			passwrd = "58778285";
+			passwrd = "";
 
 			System.out.println("Connecting PostgreSQL database");
 			// JDBC를 이용해 PostgreSQL 서버 및 데이터베이스 연결
@@ -30,7 +30,7 @@ public class main {
 
 			Statement st = conn.createStatement();
 			
-			//1. 로그인
+			//1. 첫 화면
 			while(!isLogedIn) {
 				System.out.println("***********************************");
 				System.out.println(" ┌---------- 당신의 선택 ----------┐ ");
@@ -101,6 +101,7 @@ public class main {
 								create_table(conn, "Yangcheon","Yc");//양천구
 								create_table(conn, "Nowon","Nw");//노원구
 								create_table(conn, "Gwanak","Ga");//관악구
+								System.out.println("Table create complete!");
 							}
 							else if(X==2)  //2.sign in
 								drop_table(conn,st);
@@ -174,7 +175,6 @@ public class main {
 			while(true) {//ID Duplicate 처리
 				System.out.printf("     uID : ");
 				uID = scan.nextLine();
-				//uID = scan.nextLine();
 				stmt = "select count(*) from student where uID = '"+uID+"';";
 				rs=st.executeQuery(stmt);
 				rs.next();
@@ -192,7 +192,7 @@ public class main {
 			ResultSet nrs= st.executeQuery(nst);
 			nrs.next();
 			int unum = nrs.getInt(1);
-			
+			//회원 추가
 			stmt = "Insert into student values ("+unum+",'"+uName+"',"+age+",'"+address+"',"+sex+",'"+uID+"','"+uPW+"')";
 			st.executeUpdate(stmt);
 			System.out.println("             Welcome!           ");
@@ -202,7 +202,6 @@ public class main {
 			System.out.println("Sign_up Failed!");
 			throw ex;
 		}
-		//scan.close();
 	}
 	public static boolean Sign_in(Connection conn,Statement st)throws SQLException
 	{
@@ -244,7 +243,6 @@ public class main {
 			System.out.println("Sign_in Failed!");
 			throw ex;
 		}
-		//scan.close();
 	}
 	public static void World_cup(Connection conn, Statement st)throws SQLException
 	{
@@ -257,10 +255,9 @@ public class main {
 		Double[] c = new Double[65];
 		Double[] p = new Double[65];
 		Double[] f = new Double[65];
-		Integer[] price = new Integer[65];
 		int i = 0, choice;
 		Scanner scan = new Scanner(System.in);
-		String stmt = "select name, calorie, carbonhydrate, protein, fat, avg_price from food";
+		String stmt = "select name, calorie, carbonhydrate, protein, fat from food";
 		ResultSet rs = st.executeQuery(stmt);
 		while(rs.next()) {//food table 가져오기
 			fname[i] = rs.getString(1);
@@ -268,7 +265,6 @@ public class main {
 			c[i] = rs.getDouble(3);
 			p[i] = rs.getDouble(4);
 			f[i] = rs.getDouble(5);
-			price[i] = rs.getInt(6);
 			i++;
 		}
 
@@ -301,7 +297,6 @@ public class main {
 			System.out.println(" |  탄 "+ c[rand[i]]+"g\t\t"+c[rand[i+1]]+"g\t|");
 			System.out.println(" |  단 "+ p[rand[i]]+"g\t\t"+p[rand[i+1]]+"g\t|");
 			System.out.println(" |  지 "+f[rand[i]]+"g\t\t"+f[rand[i+1]]+"g\t|");
-			System.out.println(" |  가격 "+price[rand[i]]+"$\t\t"+price[rand[i+1]]+"$\t|");
 			System.out.println(" └------------------------------┘ ");
 			System.out.printf("What is your choice? :");
 			choice = scan.nextInt()-1;
@@ -325,7 +320,6 @@ public class main {
 			System.out.println(" |  탄 "+ c[pal_gang[i]]+"g\t\t"+c[pal_gang[i+1]]+"g\t|");
 			System.out.println(" |  단 "+ p[pal_gang[i]]+"g\t\t"+p[pal_gang[i+1]]+"g\t|");
 			System.out.println(" |  지 "+f[pal_gang[i]]+"g\t\t"+f[pal_gang[i+1]]+"g\t|");
-			System.out.println(" |  가격 "+price[pal_gang[i]]+"$\t\t"+price[pal_gang[i+1]]+"$\t|");
 			System.out.println(" └------------------------------┘ ");
 			System.out.printf("   What is your choice? :");
 			choice = scan.nextInt()-1;
@@ -349,7 +343,6 @@ public class main {
 			System.out.println(" |  탄 "+ c[sa_gang[i]]+"g\t\t"+c[sa_gang[i+1]]+"g\t|");
 			System.out.println(" |  단 "+ p[sa_gang[i]]+"g\t\t"+p[sa_gang[i+1]]+"g\t|");
 			System.out.println(" |  지 "+f[sa_gang[i]]+"g\t\t"+f[sa_gang[i+1]]+"g\t|");
-			System.out.println(" |  가격 "+price[sa_gang[i]]+"$\t\t"+price[sa_gang[i+1]]+"$\t|");
 			System.out.println(" └------------------------------┘ ");
 			System.out.printf("   What is your choice? :");
 			choice = scan.nextInt()-1;
@@ -370,11 +363,11 @@ public class main {
 		System.out.println(" |  탄 "+ c[match[0]]+"g\t\t"+c[match[1]]+"g\t|");
 		System.out.println(" |  단 "+ p[match[0]]+"g\t\t"+p[match[1]]+"g\t|");
 		System.out.println(" |  지 "+f[match[0]]+"g\t\t"+f[match[1]]+"g\t|");
-		System.out.println(" |  가격 "+price[match[0]]+"$\t\t"+price[match[1]]+"$\t|");
 		System.out.println(" └------------------------------┘ ");
 		System.out.printf("   What is your choice? :");
 		choice = scan.nextInt()-1;
 		String win_menu = fname[match[choice]];
+		//우승시 winner table update
 		stmt = "select * from winner where u_num="+u_num + "and f_name='"+win_menu +"'";
 		rs = st.executeQuery(stmt);
 		if(!rs.next()) {
@@ -385,8 +378,7 @@ public class main {
 			st.executeUpdate(stmt);
 		}
 		System.out.println("************ "+ win_menu + " WIN! ************");
-		//구 선택
-		
+
 		//음식점 리스트
 		stmt = "select name,address,contact from "+gu+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
 		rs = st.executeQuery(stmt);
@@ -439,10 +431,10 @@ public class main {
 	}
 	public static void view_all_chart(Connection conn,Statement st)throws SQLException {
 		String stmt = "select * from food order by win_count desc";
+		ResultSet rs = st.executeQuery(stmt);
 		System.out.println("			전체 음식 순위");
 		System.out.println("***********************************************************");
-		ResultSet rs = st.executeQuery(stmt);
-		System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방");
 		int i = 1;
 		while(rs.next()) {
 			String name = rs.getString(1);
@@ -450,9 +442,8 @@ public class main {
 			double c = rs.getDouble(3);
 			double p = rs.getDouble(4);
 			double f = rs.getDouble(5);
-			int avg_price = rs.getInt(6);
-			int win_count = rs.getInt(7);
-			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + p + "\t" + f + "\t" + avg_price);
+			int win_count = rs.getInt(6);
+			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + p + "\t" + f );
 			i++;
 		}
 		System.out.println("Press any key to go back");
@@ -469,14 +460,14 @@ public class main {
 				+ "where u_num ="+u_num+"\n";
 		st.executeUpdate(stmt);
 		
-		stmt = "select name, calorie, carbonhydrate, protein, fat, avg_price, victory\n"
+		stmt = "select name, calorie, carbonhydrate, protein, fat, victory\n"
 				+ "from food, mine"+u_num+"\n"
 				+ "where food.name = mine"+u_num+".f_name\n"
 				+ "order by victory desc";
+		ResultSet rs = st.executeQuery(stmt);
 		System.out.println("			내가 뽑은 음식 순위");
 		System.out.println("***********************************************************");
-		ResultSet rs = st.executeQuery(stmt);
-		System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+		System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방");
 
 		int i = 1;
 		while(rs.next()) {
@@ -485,9 +476,8 @@ public class main {
 			double c = rs.getDouble(3);
 			double protein = rs.getDouble(4);
 			double f = rs.getDouble(5);
-			int avg_price = rs.getInt(6);
-			int win_count = rs.getInt(7);
-			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
+			int win_count = rs.getInt(6);
+			System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f );
 			i++;
 		}
 		//view drop
@@ -515,18 +505,18 @@ public class main {
 			max = scan.nextInt();
 			System.out.println(" └----------------------------------------------┘ ");
 			String stmt;
-			if(sex != 1 && sex !=2) {
+			if(sex != 1 && sex !=2) {//any gender
 				System.out.println("*********************************************************");
 				System.out.println("\t"+min+"세 이상"+max+"세 이하 음식 순위");
 				stmt = "create view tempView as\n"
 						+ "select f_name, win_count as victory\n"
 						+ "from winner\n"
-						+ "where u_num in (select u_num\n"
+						+ "where u_num in (select num\n"
 						+ "	from student"
 						+ "	where age >= "+min+" and age <= "+max+")";
 				st.executeUpdate(stmt);
 				
-				stmt = "select name, calorie, carbonhydrate, protein, fat, avg_price, victory\n"
+				stmt = "select name, calorie, carbonhydrate, protein, fat, victory\n"
 						+ "from food, tempView\n"
 						+ "where food.name = tempView.f_name\n"
 						+ "order by victory desc";
@@ -538,21 +528,22 @@ public class main {
 					System.out.println("*********************************************************");
 					System.out.println("\tWomen " + min+" to "+max+" years old Food Ranking");
 				}
+				//Men or Women
 				stmt = "create view tempView as\n"
 						+ "select f_name, win_count as victory\n"
 						+ "from winner\n"
-						+ "where u_num in (select u_num\n"
+						+ "where u_num in (select num\n"
 						+ "	from student"
 						+ "	where sex = "+sex+" and age >= "+min+" and age <= "+max+")";
 				st.executeUpdate(stmt);
-				stmt = "select name, calorie, carbonhydrate, protein, fat, avg_price, victory\n"
+				stmt = "select name, calorie, carbonhydrate, protein, fat, victory\n"
 						+ "from food, tempView\n"
 						+ "where food.name = tempView.f_name\n"
 						+ "order by victory desc";
 			}
 
 			r = st.executeQuery(stmt);
-			System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방\t평균가격");
+			System.out.println("순위\t우승횟수\t이름\t칼로리\t탄수화물\t단백질\t지방");
 			int i = 1;
 			while(r.next()) {
 				String name = r.getString(1);
@@ -560,9 +551,8 @@ public class main {
 				double c = r.getDouble(3);
 				double protein = r.getDouble(4);
 				double f = r.getDouble(5);
-				int avg_price = r.getInt(6);
-				int win_count = r.getInt(7);
-				System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f + "\t" + avg_price);
+				int win_count = r.getInt(6);
+				System.out.println(i + "\t" + win_count + "\t" + name + "\t" + cal + "\t" + c + "\t" + protein + "\t" + f );
 				i++;
 			}
 			stmt = "drop view tempView";
@@ -652,7 +642,6 @@ public class main {
 		}
 	}
 	public static void create_table(Connection conn, String gu1, String gu2, String go) throws SQLException, IOException, ParseException {
-		System.out.println("table을 create합니다.");
 		String stmt = "create table "+ gu1 +" (name varchar(50),snt varchar(20), main_menu varchar(20), address varchar(100), contact varchar(20))";
 		PreparedStatement p = conn.prepareStatement(stmt);
 		p.executeUpdate();
