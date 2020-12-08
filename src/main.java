@@ -22,13 +22,14 @@ public class main {
 			String dbacct, passwrd, url;
 			url = "jdbc:postgresql:DSDB";
 			dbacct = "postgres";
-			passwrd = "";
+			passwrd = "201720792";
 
 			System.out.println("Connecting PostgreSQL database");
 			// JDBC를 이용해 PostgreSQL 서버 및 데이터베이스 연결
 			Connection conn = DriverManager.getConnection(url, dbacct, passwrd);
 
 			Statement st = conn.createStatement();
+			
 			
 			//1. 첫 화면
 			while(!isLogedIn) {
@@ -380,7 +381,7 @@ public class main {
 		System.out.println("************ "+ win_menu + " WIN! ************");
 
 		//음식점 리스트
-		stmt = "select name,address,contact from "+gu+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
+		stmt = "select distinct name, address, contact from "+gu+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'";
 		rs = st.executeQuery(stmt);
 		i=1;
 		System.out.printf("[ 선택 구 음식점 ]\n");
@@ -390,9 +391,9 @@ public class main {
 			System.out.printf("#%d %s / %s / %s\n",i++,rs.getString(1),rs.getString(2),rs.getString(3));
 		}
 		// 주변 구 음식점 (union)
-		stmt = "select name,address,contact from "+sub_gu1+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
+		stmt = "select distinct name, address, contact from "+sub_gu1+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
 				+ "union\n"
-				+ "select name,address,contact from "+sub_gu2+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
+				+ "select distinct name, address, contact from "+sub_gu2+" where main_menu like '%"+win_menu+"%' or name like '%"+win_menu+"%'\n"
 						+ "order by address";
 		rs = st.executeQuery(stmt);
 		System.out.printf("[ 주변 구 음식점 ]\n");
@@ -789,4 +790,8 @@ public class main {
 		else return null;
 	}
 }
+
+
+
+
 
